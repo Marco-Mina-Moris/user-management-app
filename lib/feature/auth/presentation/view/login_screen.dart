@@ -4,13 +4,18 @@ import 'package:toastification/toastification.dart';
 
 import 'package:user_management_app/core/constants/app_strings.dart';
 import 'package:user_management_app/core/dialogs/app_toasts.dart';
+import 'package:user_management_app/core/network/dio_client.dart';
 import 'package:user_management_app/core/utils/validator.dart';
 
 import 'package:user_management_app/feature/auth/presentation/view_model/auth_state.dart';
 import 'package:user_management_app/feature/auth/presentation/view_model/auth_view_model.dart';
 import 'package:user_management_app/feature/auth/presentation/widgets/custom_button.dart';
 import 'package:user_management_app/feature/auth/presentation/widgets/custom_text_field.dart';
-import 'package:user_management_app/main.dart';
+import 'package:user_management_app/feature/users/data/datasources/users_remote_data_source.dart';
+import 'package:user_management_app/feature/users/data/repositories/users_repository_impl.dart';
+import 'package:user_management_app/feature/users/domain/usecases/get_users_usecase.dart';
+import 'package:user_management_app/feature/users/presentation/view/users_list_Screen.dart';
+import 'package:user_management_app/feature/users/presentation/view_model/users_view_model.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
@@ -41,11 +46,20 @@ class LoginView extends StatelessWidget {
               message: 'Login successful',
               type: ToastificationType.success,
             );
-
             Navigator.of(context).pushReplacement(
               MaterialPageRoute(
-                builder: (_) => MyApp(
-                    loginUseCase: context.read<AuthViewModel>().loginUseCase),
+                builder: (_) => BlocProvider(
+                  create: (_) => UsersViewModel(
+                    GetUsersUseCase(
+                      UsersRepositoryImpl(
+                        UsersRemoteDataSourceImpl(
+                          DioClient(),
+                        ),
+                      ),
+                    ),
+                  )..getUsers(),
+                  child: const UsersListScreen(),
+                ),
               ),
             );
           }
