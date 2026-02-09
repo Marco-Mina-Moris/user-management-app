@@ -4,18 +4,13 @@ import 'package:toastification/toastification.dart';
 
 import 'package:user_management_app/core/constants/app_strings.dart';
 import 'package:user_management_app/core/dialogs/app_toasts.dart';
-import 'package:user_management_app/core/network/dio_client.dart';
 import 'package:user_management_app/core/utils/validator.dart';
 
 import 'package:user_management_app/feature/auth/presentation/view_model/auth_state.dart';
 import 'package:user_management_app/feature/auth/presentation/view_model/auth_view_model.dart';
 import 'package:user_management_app/feature/auth/presentation/widgets/custom_button.dart';
 import 'package:user_management_app/feature/auth/presentation/widgets/custom_text_field.dart';
-import 'package:user_management_app/feature/users/data/datasources/users_remote_data_source.dart';
-import 'package:user_management_app/feature/users/data/repositories/users_repository_impl.dart';
-import 'package:user_management_app/feature/users/domain/usecases/get_users_usecase.dart';
 import 'package:user_management_app/feature/users/presentation/view/users_list_Screen.dart';
-import 'package:user_management_app/feature/users/presentation/view_model/users_view_model.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
@@ -46,20 +41,10 @@ class LoginView extends StatelessWidget {
               message: 'Login successful',
               type: ToastificationType.success,
             );
+
             Navigator.of(context).pushReplacement(
               MaterialPageRoute(
-                builder: (_) => BlocProvider(
-                  create: (_) => UsersViewModel(
-                    GetUsersUseCase(
-                      UsersRepositoryImpl(
-                        UsersRemoteDataSourceImpl(
-                          DioClient(),
-                        ),
-                      ),
-                    ),
-                  )..getUsers(),
-                  child: const UsersListScreen(),
-                ),
+                builder: (_) => const UsersListScreen(),
               ),
             );
           }
@@ -76,12 +61,10 @@ class LoginView extends StatelessWidget {
         builder: (context, state) {
           return SafeArea(
             child: SingleChildScrollView(
-              padding:
-                  const EdgeInsets.only(left: 24.0, right: 24.0, top: 110.0),
+              padding: const EdgeInsets.only(left: 24, right: 24, top: 110),
               child: Form(
                 key: formKey,
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     const Icon(

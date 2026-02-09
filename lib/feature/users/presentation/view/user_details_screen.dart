@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:user_management_app/feature/users/domain/entities/user.dart';
 import 'package:user_management_app/feature/users/presentation/view_model/user_details_state.dart';
 import 'package:user_management_app/feature/users/presentation/view_model/user_details_view_model.dart';
 import 'package:user_management_app/feature/users/presentation/widgets/error_view.dart';
@@ -9,44 +8,23 @@ import 'package:user_management_app/feature/users/presentation/widgets/loading_v
 import 'package:user_management_app/feature/users/presentation/widgets/profile_header.dart';
 
 class UserDetailsScreen extends StatelessWidget {
-  final User user;
-
-  UserDetailsScreen({
-    super.key,
-    required this.user,
-  });
-
-  final ValueNotifier<bool> isEditMode = ValueNotifier(false);
-
-  late final TextEditingController firstNameController =
-      TextEditingController(text: user.firstName);
-  late final TextEditingController lastNameController =
-      TextEditingController(text: user.lastName);
-  late final TextEditingController emailController =
-      TextEditingController(text: user.email);
-
-  User buildUpdatedUser() {
-    return user.copyWith(
-      firstName: firstNameController.text.trim(),
-      lastName: lastNameController.text.trim(),
-      email: emailController.text.trim(),
-    );
-  }
+  const UserDetailsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final viewModel = context.read<UserDetailsViewModel>();
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('User Details'),
         actions: [
-          ValueListenableBuilder<bool>(
-            valueListenable: isEditMode,
-            builder: (context, edit, _) {
+          BlocBuilder<UserDetailsViewModel, UserDetailsState>(
+            builder: (context, state) {
               return IconButton(
-                icon: Icon(edit ? Icons.close : Icons.edit),
-                onPressed: () => isEditMode.value = !edit,
+                icon: Icon(
+                  state.isEditMode ? Icons.close : Icons.edit,
+                ),
+                onPressed: () {
+                  context.read<UserDetailsViewModel>().toggleEditMode();
+                },
               );
             },
           ),
@@ -54,11 +32,13 @@ class UserDetailsScreen extends StatelessWidget {
       ),
       body: BlocConsumer<UserDetailsViewModel, UserDetailsState>(
         listener: (context, state) {
-          if (state is UserDetailsSuccess) {
+          if (state is UserDetailsSuccess && !state.isEditMode) {
             Navigator.pop(context, state.user);
           }
         },
         builder: (context, state) {
+          final viewModel = context.read<UserDetailsViewModel>();
+
           if (state is UserDetailsLoading) {
             return const LoadingView();
           }
@@ -66,51 +46,44 @@ class UserDetailsScreen extends StatelessWidget {
           if (state is UserDetailsError) {
             return ErrorView(
               message: state.message,
-              onRetry: () => viewModel.updateUser(buildUpdatedUser()),
+              onRetry: viewModel.saveChanges,
             );
           }
 
           return Padding(
             padding: const EdgeInsets.all(16),
-            child: ValueListenableBuilder<bool>(
-              valueListenable: isEditMode,
-              builder: (context, edit, _) {
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ProfileHeader(user: user),
-                    const SizedBox(height: 24),
-                    Field(
-                      label: 'First Name',
-                      controller: firstNameController,
-                      enabled: edit,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ProfileHeader(user: state.user),
+                const SizedBox(height: 24),
+                Field(
+                  label: 'First Name',
+                  controller: viewModel.firstNameController,
+                  enabled: state.isEditMode,
+                ),
+                const SizedBox(height: 12),
+                Field(
+                  label: 'Last Name',
+                  controller: viewModel.lastNameController,
+                  enabled: state.isEditMode,
+                ),
+                const SizedBox(height: 12),
+                Field(
+                  label: 'Email',
+                  controller: viewModel.emailController,
+                  enabled: state.isEditMode,
+                ),
+                const Spacer(),
+                if (state.isEditMode)
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: viewModel.saveChanges,
+                      child: const Text('Save Changes'),
                     ),
-                    const SizedBox(height: 12),
-                    Field(
-                      label: 'Last Name',
-                      controller: lastNameController,
-                      enabled: edit,
-                    ),
-                    const SizedBox(height: 12),
-                    Field(
-                      label: 'Email',
-                      controller: emailController,
-                      enabled: edit,
-                    ),
-                    const Spacer(),
-                    if (edit)
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          onPressed: () => viewModel.updateUser(
-                            buildUpdatedUser(),
-                          ),
-                          child: const Text('Save Changes'),
-                        ),
-                      ),
-                  ],
-                );
-              },
+                  ),
+              ],
             ),
           );
         },

@@ -18,7 +18,7 @@ class UsersResponseModel {
   });
 
   factory UsersResponseModel.fromJson(Map<String, dynamic> json) =>
-      _$UsersResponseModelFromJson(json);
+      $UsersResponseModelFromJson(json);
 
-  Map<String, dynamic> toJson() => _$UsersResponseModelToJson(this);
+  Map<String, dynamic> toJson() => $UsersResponseModelToJson(this);
 }

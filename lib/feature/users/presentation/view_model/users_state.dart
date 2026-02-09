@@ -1,4 +1,4 @@
-import '../../domain/entities/user.dart';
+import 'package:user_management_app/feature/users/domain/entities/user.dart';
 
 abstract class UsersState {}
 
@@ -8,10 +8,10 @@ class UsersLoading extends UsersState {}
 
 class UsersLoaded extends UsersState {
   final List<User> users;
-  UsersLoaded(this.users);
+  UsersLoaded({required this.users});
 }
 
 class UsersError extends UsersState {
   final String message;
-  UsersError(this.message);
+  UsersError({required this.message});
 }
