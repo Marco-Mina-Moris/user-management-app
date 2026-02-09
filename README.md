@@ -86,9 +86,9 @@ lib/
 ---
 
 =>  Demo Video
-
+> [🔗 Google Drive](https://drive.google.com/file/d/1ys8YSCZttPAPCBZ6REhEfB2_Ds0BayCQ/view?usp=drive_link)  
  **Screen Recording – Demo Video**  
-`assets/demo/app_demo.mp4`
+[`assets/d](https://github.com/user-attachments/assets/3d8d0fbb-59a1-4202-a4a3-f7a3e6580411)
 
 > If the video doesn’t play on GitHub, download it and open it locally.
 
