@@ -6,7 +6,7 @@ part of 'users_response_model.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-UsersResponseModel _$UsersResponseModelFromJson(Map<String, dynamic> json) =>
+UsersResponseModel $UsersResponseModelFromJson(Map<String, dynamic> json) =>
     UsersResponseModel(
       users: (json['users'] as List<dynamic>)
           .map((e) => UserModel.fromJson(e as Map<String, dynamic>))
@@ -16,7 +16,7 @@ UsersResponseModel _$UsersResponseModelFromJson(Map<String, dynamic> json) =>
       limit: json['limit'] as int,
     );
 
-Map<String, dynamic> _$UsersResponseModelToJson(UsersResponseModel instance) =>
+Map<String, dynamic> $UsersResponseModelToJson(UsersResponseModel instance) =>
     <String, dynamic>{
       'users': instance.users,
       'total': instance.total,

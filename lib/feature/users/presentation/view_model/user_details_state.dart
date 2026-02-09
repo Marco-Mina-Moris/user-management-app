@@ -1,17 +1,40 @@
-import '../../domain/entities/user.dart';
+import 'package:user_management_app/feature/users/domain/entities/user.dart';
 
-abstract class UserDetailsState {}
+abstract class UserDetailsState {
+  final User user;
+  final bool isEditMode;
 
-class UserDetailsInitial extends UserDetailsState {}
+  const UserDetailsState({
+    required this.user,
+    required this.isEditMode,
+  });
+}
 
-class UserDetailsLoading extends UserDetailsState {}
+class UserDetailsInitial extends UserDetailsState {
+  const UserDetailsInitial(User user)
+      : super(user: user, isEditMode: false);
+}
+
+class UserDetailsLoading extends UserDetailsState {
+  const UserDetailsLoading({
+    required super.user,
+    required super.isEditMode,
+  });
+}
 
 class UserDetailsSuccess extends UserDetailsState {
-  final User user;
-  UserDetailsSuccess(this.user);
+  const UserDetailsSuccess({
+    required super.user,
+    required super.isEditMode,
+  });
 }
 
 class UserDetailsError extends UserDetailsState {
   final String message;
-  UserDetailsError(this.message);
+
+  const UserDetailsError({
+    required this.message,
+    required super.user,
+    required super.isEditMode,
+  });
 }

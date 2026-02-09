@@ -37,4 +37,19 @@ class UserModel extends User {
       birthDate: entity.birthDate,
     );
   }
+
+  User toEntity() {
+    return User(
+      id: id,
+      firstName: firstName,
+      lastName: lastName,
+      email: email,
+      username: username,
+      gender: gender,
+      image: image,
+      phone: phone,
+      age: age,
+      birthDate: birthDate,
+    );
+  }
 }

@@ -6,7 +6,9 @@ import 'package:user_management_app/feature/users/domain/entities/user.dart';
 abstract class UsersRepository {
   Future<Either<Failure, List<User>>> getUsers({
     required int page,
+    required int limit,
   });
 
   Future<Either<Failure, User>> updateUser(User user);
 }
+

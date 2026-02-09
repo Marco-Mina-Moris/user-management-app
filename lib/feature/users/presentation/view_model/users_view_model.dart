@@ -1,8 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-
-import '../../domain/entities/user.dart';
-import '../../domain/usecases/get_users_usecase.dart';
-import 'users_state.dart';
+import 'package:user_management_app/feature/users/domain/entities/user.dart';
+import 'package:user_management_app/feature/users/domain/usecases/get_users_usecase.dart';
+import 'package:user_management_app/feature/users/presentation/view_model/users_state.dart';
 
 class UsersViewModel extends Cubit<UsersState> {
   final GetUsersUseCase getUsersUseCase;
@@ -10,49 +9,56 @@ class UsersViewModel extends Cubit<UsersState> {
   UsersViewModel(this.getUsersUseCase) : super(UsersInitial());
 
   int page = 1;
+  final int limit = 10;
   bool isFetching = false;
-  bool hasReachedEnd = false;
+  bool hasReachedMax = false;
 
-  /// Local source of truth for updated users
+  /// cache for locally updated users (DummyJSON workaround)
   final Map<int, User> updatedUsersCache = {};
 
   Future<void> getUsers({bool refresh = false}) async {
-    if (isFetching || hasReachedEnd) return;
+    if (isFetching || hasReachedMax) return;
 
     if (refresh) {
       page = 1;
-      hasReachedEnd = false;
+      hasReachedMax = false;
       emit(UsersLoading());
     }
 
     isFetching = true;
 
-    final result = await getUsersUseCase(GetUsersParams(page));
+    final result = await getUsersUseCase(
+      GetUsersParams(
+        page: page,
+        limit: limit,
+      ),
+    );
 
     result.fold(
       (failure) {
         isFetching = false;
-        emit(UsersError(failure.message));
+        emit(UsersError(message: failure.message));
       },
       (users) {
         isFetching = false;
 
         if (users.isEmpty) {
-          hasReachedEnd = true;
+          hasReachedMax = true;
+          return;
         }
+
+        /// merge API users with locally updated users
+        final mergedUsers = users.map((user) {
+          return updatedUsersCache[user.id] ?? user;
+        }).toList();
 
         final currentUsers = state is UsersLoaded && !refresh
             ? (state as UsersLoaded).users
             : <User>[];
 
-        /// Merge API users with local updated users
-        final mergedUsers = users.map((user) {
-          return updatedUsersCache[user.id] ?? user;
-        }).toList();
-
         emit(
           UsersLoaded(
-            refresh ? mergedUsers : [...currentUsers, ...mergedUsers],
+            users: [...currentUsers, ...mergedUsers],
           ),
         );
 
@@ -61,21 +67,22 @@ class UsersViewModel extends Cubit<UsersState> {
     );
   }
 
-  /// Called when user is updated from details screen
+  /// called after returning from UserDetailsScreen
   void updateUserInList(User updatedUser) {
+    if (state is! UsersLoaded) return;
+
     updatedUsersCache[updatedUser.id] = updatedUser;
 
-    if (state is UsersLoaded) {
-      final users = List<User>.from(
-        (state as UsersLoaded).users,
-      );
+    final currentUsers = List<User>.from(
+      (state as UsersLoaded).users,
+    );
 
-      final index = users.indexWhere((u) => u.id == updatedUser.id);
+    final index = currentUsers.indexWhere((u) => u.id == updatedUser.id);
 
-      if (index != -1) {
-        users[index] = updatedUser;
-        emit(UsersLoaded(users));
-      }
-    }
+    if (index == -1) return;
+
+    currentUsers[index] = updatedUser;
+
+    emit(UsersLoaded(users: currentUsers));
   }
 }

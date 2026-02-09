@@ -45,11 +45,25 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<Either<Failure, bool>> logout() async {
     try {
+      final token = await localDataSource.getToken();
+      
+      await remoteDataSource.logout(token: token);
+      
       await localDataSource.deleteToken();
+      
       return const Right(true);
     } on CacheException catch (e) {
+      try {
+        await localDataSource.deleteToken();
+      } catch (_) {}
       return Left(CacheFailure(e.message));
+    } on NetworkException catch (e) {
+      await localDataSource.deleteToken();
+      return Left(NetworkFailure(e.message));
     } catch (e) {
+      try {
+        await localDataSource.deleteToken();
+      } catch (_) {}
       return Left(UnknownFailure(e.toString()));
     }
   }

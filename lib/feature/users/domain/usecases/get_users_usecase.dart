@@ -10,17 +10,20 @@ class GetUsersUseCase implements UseCase<List<User>, GetUsersParams> {
   GetUsersUseCase(this.repository);
 
   @override
-  Future<Either<Failure, List<User>>> call(
-    GetUsersParams params,
-  ) async {
+  Future<Either<Failure, List<User>>> call(GetUsersParams params) async {
     return await repository.getUsers(
       page: params.page,
+      limit: params.limit,
     );
   }
 }
 
 class GetUsersParams {
   final int page;
+  final int limit;
 
-  GetUsersParams(this.page);
+  GetUsersParams({
+    required this.page,
+    required this.limit,
+  });
 }
