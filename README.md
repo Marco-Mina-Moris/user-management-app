@@ -77,18 +77,18 @@ lib/
 
 | Login | Users List |
 |------|-----------|
-| ![](assets/screenshots/login.png) | ![](assets/screenshots/users_list.png) |
+| ![](assets/screenshots/login.jpg) | ![](assets/screenshots/users_list.jpg) |
 
 | User Details | Edit User |
 |-------------|-----------|
-| ![](assets/screenshots/user_details.png) | ![](assets/screenshots/edit_user.png) |
+| ![](assets/screenshots/user_details.jpg) | ![](assets/screenshots/edit_user.jpg) |
 
 ---
 
 =>  Demo Video
 
  **Screen Recording – Demo Video**  
-`assets/demo/demo.mp4`
+`assets/demo/app_demo.mp4`
 
 > If the video doesn’t play on GitHub, download it and open it locally.
 
